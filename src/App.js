@@ -7,7 +7,7 @@ import { Modal } from 'react-responsive-modal';
 import memoize from 'memoize-one';
 import parse from 'html-react-parser';
 
-const columns = memoize((seSelectedCountry, modal) => [
+const columns = memoize((seSelectedCountry, modal, seCountryLanguages, modal2) => [
   {
     name: 'Official name',
     selector: row => row.name.official,
@@ -23,7 +23,7 @@ const columns = memoize((seSelectedCountry, modal) => [
   },
   {
     name: 'Languages',
-    selector: row => <ul>{row.languages ? Object.values(row.languages).map((language, index) => <li key={index}>{language}</li>) : null}</ul>,
+    selector: row => <a href="#" onClick={() => { seCountryLanguages(row.languages); modal2(true) }}>View languages</a>,
   },
   {
     name: 'Population',
@@ -35,7 +35,7 @@ const columns = memoize((seSelectedCountry, modal) => [
   },
   {
     name: 'Wikipedia Info',
-    selector: row => <button onClick={() => { modal(true); seSelectedCountry(row.name.common)}} className="btn btn-warning">View Info</button>
+    selector: row => <button onClick={() => { modal(true); seSelectedCountry(row.name.common) }} className="btn btn-warning">View Info</button>
   },
 ]);
 
@@ -43,7 +43,9 @@ function App() {
 
   const [countriesData, setCountriesData] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountryLanguages, setSelectedCountryLanguages] = useState("");
   const [countryData, setCountryData] = useState({});
 
 
@@ -64,16 +66,16 @@ function App() {
   const selectCountry = country => {
     setSelectedCountry(country)
     fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${country}`)
-    .then(res => res.json())
-    .then(
-      (result) => {
-        setCountryData(result);
-      },
-      (error) => {
-        console.log(error)
-      }
-    )
-    
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setCountryData(result);
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+
   }
 
   return (
@@ -88,14 +90,19 @@ function App() {
         <div className="row">
           <h1>Countries List</h1>
           <DataTable
-            columns={columns(selectCountry, setOpen)}
+            columns={columns(selectCountry, setOpen, setSelectedCountryLanguages, setOpenModal)}
             data={countriesData}
             pagination={true}
             paginationComponentOptions={{ rowsPerPageText: 'Rows per page:', rangeSeparatorText: 'from' }}
           />
           <Modal open={open} onClose={() => setOpen(false)} center>
-            <h2>{selectedCountry}</h2>
+            <h1>{selectedCountry}</h1>
             {countryData.extract_html ? parse(countryData.extract_html) : null}
+          </Modal>
+          <Modal open={openModal} onClose={() => setOpenModal(false)} center>
+            <br/>
+            <h1>Languages</h1>
+            <ul>{selectedCountryLanguages ? Object.values(selectedCountryLanguages).sort().map((language, index) => <li key={index}>{language}</li>) : null}</ul>
           </Modal>
         </div>
       </div>
@@ -104,3 +111,5 @@ function App() {
 }
 
 export default App;
+
+//<ul>{row.languages ? Object.values(row.languages).map((language, index) => <li key={index}>{language}</li>) : null}</ul>
