@@ -1,7 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
 
 function App() {
+
+  const [countriesData, setCountriesData] = useState([]);
+  
+  useEffect(()=>{
+    fetch("https://restcountries.com/v3.1/all")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        setCountriesData(result);
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
+  },[])
   return (
     <div className="App">
       <header className="App-header">
@@ -16,6 +32,7 @@ function App() {
           rel="noopener noreferrer"
         >
           Learn React
+          {console.log(countriesData)}
         </a>
       </header>
     </div>
