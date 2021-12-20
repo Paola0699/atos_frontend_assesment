@@ -19,23 +19,16 @@ function App() {
     )
   },[])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-          {console.log(countriesData)}
-        </a>
-      </header>
-    </div>
+   <div id="app">
+     {countriesData.map((country, index) => 
+       //console.log(country.name.nativeName)
+       //console.log(country.capital)
+       //console.log(country.region)
+       //console.log(country.languages)
+       //console.log(country.population)  
+       <img key={index} src={country.flags.png}/>
+     )}
+   </div>
   );
 }
 
